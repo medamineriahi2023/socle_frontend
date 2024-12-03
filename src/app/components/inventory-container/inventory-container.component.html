@@ -1,0 +1,28 @@
+
+<div class="flex flex-col w-full">
+
+    <div class="w-11/12 mx-auto mt-5">
+        <div class="flex flex-row w-full">
+            <filter (filterChange)="filterValue = $event" [filterValue]="filterValue"></filter>
+            <button
+                [disabled]="!isUserAdmin"
+                class="ml-auto mr-3 mt-7"
+                mat-flat-button
+                [color]="'primary'"
+                (click)="addProduct()">
+                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                <span class="ml-2 mr-1" i18n>Add</span>
+            </button>
+        </div>
+        <p-accordion [activeIndex]="selectedInventory != null ? 1 : 0" (activeIndexChange)="activeIndexChange($event)">
+            <p-accordionTab [tabStyle]="{'background':'red'}" header="Inventories">
+        <app-inventory-table (depotProduct)="getDepotProduct($event)" (checkProducts)="getCheckProduct($event)" [refresh]="refresh" [filterValue]="filterValue"
+                             (addProductForInventory)="addProductforInventory($event)" (productBarCode)="productBarCode($event)"></app-inventory-table>
+            </p-accordionTab>
+            <p-accordionTab header="Products" [disabled]="!selectedInventory">
+            <app-product-table [depot]="depot" [checkProduct]="checkProduct" [selectedProductBarCode]="selectedProductBarCode" [selectedInventory]="selectedInventory"></app-product-table>
+            </p-accordionTab>
+        </p-accordion>
+    </div>
+
+</div>

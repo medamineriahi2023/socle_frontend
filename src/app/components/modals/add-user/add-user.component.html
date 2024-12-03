@@ -1,0 +1,241 @@
+<div class="flex flex-col flex-auto md:min-w-200 max-w-700 max-h-200">
+
+    <!-- Header -->
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-primary text-on-primary">
+        <div class="text-lg font-medium">{{title}}</div>
+        <button
+            mat-icon-button
+            (click)="close()"
+            [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="userForm" class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto overflow-x-hidden">
+
+        <div class="avatar-container">
+            <div class="image-container" *ngIf="file; else placeholder"
+                 [ngClass]="{'box-shadow-avatar': !!file}"
+                 [ngStyle]="{backgroundImage: 'url(' + file + ')'}">
+            </div>
+
+            <ng-template #placeholder>
+                <div class="image-container avatar-placeholder">
+                </div>
+            </ng-template>
+
+            <label for="avatar-input-file">
+                <div class="icon-wrapper">
+                    <input type="file" id="avatar-input-file" accept="image/*" (change)="onFileChange($event)" />
+                    <mat-icon class="icon" fontIcon="edit"></mat-icon>
+                </div>
+            </label>
+
+        </div>
+
+
+        <!--fullname-->
+        <mat-form-field class="fuse-mat-dense ">
+            <mat-label class="text-md font-medium" i18n>First name</mat-label>
+            <input type="firstName" matInput required formControlName="firstName" [appMaxLength]="FieldMaxLength.NAME">
+            <mat-error *ngIf="userForm.controls.firstName.invalid" i18n>
+                first name is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="fuse-mat-dense ">
+            <mat-label class="text-md font-medium" i18n>Last name</mat-label>
+            <input type="lastName" matInput required formControlName="lastName" [appMaxLength]="FieldMaxLength.NAME">
+            <mat-error *ngIf="userForm.controls.lastName.invalid" i18n>
+                last name is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="fuse-mat-dense w-full">
+            <mat-label class="text-md font-medium" i18n>Email</mat-label>
+            <input type="email" matInput required formControlName="email" placeholder="Ex. pat@example.com" [appMaxLength]="FieldMaxLength.EMAIL">
+
+            <mat-error *ngIf="userForm.controls.email.invalid && userForm.controls.email.errors.email" i18n>
+                Please enter a valid email address
+            </mat-error>
+            <mat-error *ngIf="userForm.controls.email.invalid && userForm.controls.email.errors.required" i18n>
+                Email is <strong>required</strong>
+            </mat-error>
+
+        </mat-form-field>
+
+        <!--username-->
+        <mat-form-field class="fuse-mat-dense w-full">
+            <mat-label class="text-md font-medium">Username</mat-label>
+            <input type="text" matInput formControlName="userName" (focus)="fetchUsernameSuggestions()" [appMaxLength]="FieldMaxLength.NAME">
+            <mat-error *ngIf="userForm.controls.userName.hasError('required')" i18n>
+                Username is <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="userForm.controls.userName.hasError('usernameTaken')" i18n>
+                Username is already taken.
+            </mat-error>
+            <mat-icon *ngIf="!isUsernameTaken && !loading && !userForm.controls.userName.invalid" style="color: darkgreen">done_all</mat-icon>
+            <mat-spinner *ngIf="loading" style="width: 20px!important; height: 20px!important;"></mat-spinner>
+        </mat-form-field>
+        <div *ngIf="!userForm.controls.userName.value && (userForm.controls.firstName.value && userForm.controls.lastName.value)" class="suggestions">
+            <p *ngFor="let suggestion of usernameSuggestions" (click)="selectSuggestion(suggestion)">
+                {{ suggestion }}
+            </p>
+        </div>
+
+        <div *ngIf="operation=== 'Save'">
+            <mat-label class="text-md font-medium" i18n>Phone</mat-label>
+            <intl-telephone-input
+                [preferredCountries]="[CountryISO.Tunisia, CountryISO.France]"
+                [enablePlaceholder]="true"
+                [searchCountryFlag]="true"
+                [separateDialCode]="false"
+                [enableAutoCountrySelect]="true"
+                [searchCountryField]="SearchCountryField.All"
+                [phoneValidation]="false"
+                [numberFormat]="PhoneNumberFormat.International"
+                (onChange)="onInputChange($event)"
+            >
+            </intl-telephone-input>
+        <mat-error *ngIf="phoneNumber != undefined && phoneNumber.phoneNumber.length == 0" i18n>
+            phone is <strong>required</strong>
+        </mat-error>
+
+        <mat-error *ngIf="phoneNumber != undefined && !phoneNumber?.isNumberValid" i18n>
+            phone is <strong>not valid</strong>
+        </mat-error>
+                <br>
+            </div>
+        <mat-form-field *ngIf="operation=='Save' && data.selectedTab ==1"  class="fuse-mat-dense w-full mr-2">
+            <mat-label class="text-md font-medium" i18n>Organisation</mat-label>
+            <mat-select #organisationsList  multiple>
+                <div *ngFor="let org of organisations">
+                    <mat-option [value]="org?.id">
+                        {{org?.name}}
+                    </mat-option>
+                </div>
+            </mat-select>
+            <mat-error *ngIf="organisationList?.value == null" i18n>
+                at least one organization <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+
+
+        <div class="flex flex-row items-center justify-between" *ngIf="operation == 'Save'">
+
+            <!--password-->
+            <mat-form-field class="fuse-mat-dense w-full mr-2" >
+                <mat-label class="text-md font-medium" i18n>Password</mat-label>
+                <input required
+                       id="password"
+                       matInput
+                       type="password"
+                       formControlName="password"
+                       #passwordField>
+                <button
+                    mat-icon-button
+                    type="button"
+                    (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
+                    matSuffix>
+                    <mat-icon
+                        class="icon-size-5"
+                        *ngIf="passwordField.type === 'password'"
+                        [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                    <mat-icon
+                        class="icon-size-5"
+                        *ngIf="passwordField.type === 'text'"
+                        [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                </button>
+
+            </mat-form-field>
+
+
+            <!--confirm password-->
+            <mat-form-field class="fuse-mat-dense w-full">
+                <mat-label class="text-md font-medium" i18n>Confirm Password</mat-label>
+                <input required
+                       id="confirmPassword"
+                       matInput
+                       type="password"
+                       formControlName="confirmPassword"
+                       #confirmPasswordField>
+                <button
+                    mat-icon-button
+                    type="button"
+                    (click)="confirmPasswordField.type === 'password' ? confirmPasswordField.type = 'text' : confirmPasswordField.type = 'password'"
+                    matSuffix>
+                    <mat-icon
+                        class="icon-size-5"
+                        *ngIf="confirmPasswordField.type === 'password'"
+                        [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                    <mat-icon
+                        class="icon-size-5"
+                        *ngIf="confirmPasswordField.type === 'text'"
+                        [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                </button>
+                <mat-error
+                    *ngIf="userForm.controls.confirmPassword.invalid && userForm.controls.confirmPassword.errors.required" i18n>
+                    confirm Password is <strong>required</strong>
+                </mat-error>
+                <mat-error
+                    *ngIf="this.userForm.controls.confirmPassword.invalid && this.userForm.controls.confirmPassword.errors.mustMatch" i18n>
+                    Password and Confirm Password must be match
+                </mat-error>
+            </mat-form-field>
+
+        </div>
+        <div class="text-red-400 text-sm" *ngIf="passwordFormField?.dirty">
+
+            <span class="block" [ngClass]="{'text-primary': passwordFormField?.value?.match('^(?=.*[A-Z])')}" i18n>At least uppercase letter.</span>
+            <span class="block" [ngClass]="{'text-primary': passwordFormField?.value?.match('(?=.*[a-z])')}" i18n>At least one lowercase letter.</span>
+
+            <span class="block" [ngClass]="{'text-primary': passwordFormField?.value?.match('(.*[0-9].*)')}" i18n>At least one digit.</span>
+
+            <span class="block" [ngClass]="{'text-primary': passwordFormField?.value?.match('(?=.*[!@#$%^&*])')}" i18n>At least one special character.</span>
+
+            <span class="block" [ngClass]="{'text-primary': passwordFormField?.value?.match('.{8,}')}" i18n>At least 8 characters long.</span>
+
+        </div>
+
+        <mat-checkbox [checked]="userForm.controls?.active?.value" formControlName="active" i18n> is active
+        </mat-checkbox>
+
+        <mat-checkbox [checked]="userForm.controls?.isDeliveryMan?.value" formControlName="isDeliveryMan" i18n> make it delivery man
+        </mat-checkbox>
+
+    </form>
+
+
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8
+  bg-gray-50 dark:bg-transparent">
+
+        <div class="flex items-center ml-auto mt-4 sm:mt-0">
+
+            <button class="ml-auto sm:ml-0"
+                    value="Cancel" mat-button
+                    color="warn"
+                    (click)="close()">
+                <mat-icon>cancel</mat-icon>
+                <span i18n>Cancel</span>
+            </button>
+
+            <button [value]="operation"
+                    (click)="onSubmit()"
+                    mat-button
+                    [matTooltip]="operation"
+                    color="accent"
+                    class="ml-auto"
+                    [disabled]="!userForm.valid || (operation == 'Save' && (!phoneNumber?.isNumberValid || phoneNumber.phoneNumber.length == 0))">
+                <mat-icon svgIcon="feather:edit"></mat-icon>
+                <span>{{operation}}</span>
+            </button>
+
+
+        </div>
+    </div>
+
+</div>
+

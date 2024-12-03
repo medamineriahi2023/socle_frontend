@@ -1,0 +1,204 @@
+<mat-card class="main-menu-tab-card relative">
+    <p-toast></p-toast>
+    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%!important; padding: 10px">
+        <div>
+            <span *ngIf="!selectedInventory" i18n>Products List </span>
+            <span *ngIf="selectedInventory && selectedProductBarCode" i18n>Products List for the product code {{selectedProductBarCode}} </span>
+            <span *ngIf="checkProduct && selectedInventory" i18n>Check Products List of the inventory : <span style="color: red"> {{selectedInventory.name}} </span></span>
+            <span *ngIf="!checkProduct && selectedInventory" i18n>Adding products to the inventory : <span style="color: red"> {{selectedInventory.name}} </span>
+                {{depot ? " from the DEPOT " : null}} <span *ngIf="depot" style="color: #4c4cfa">{{depot.name}}</span></span>
+        </div>
+        <div style="display: flex; gap: 10px">
+            <mat-form-field style="width: 200px;">
+                <mat-label i18n>CATEGORIES</mat-label>
+                <mat-select [formControl]="categoryForm" multiple>
+                    <mat-option *ngFor="let category of categories" [value]="category">{{category.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field style="width: 200px;">
+                <mat-label i18n>SUB-CATEGORIES</mat-label>
+                <mat-select [formControl]="subCategoryForm" multiple>
+                    <mat-option *ngFor="let subCategory of subCategories" [value]="subCategory">{{subCategory.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field style="width: 150px;">
+                <mat-label i18n>BRAND</mat-label>
+                <mat-select [formControl]="brandForm" multiple>
+                    <mat-option *ngFor="let brand of brands" [value]="brand.id">{{brand.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div style="display:flex; align-items: center; justify-content: center">
+            <mat-form-field style="width: 150px;">
+                <mat-label i18n>SORT BY</mat-label>
+                <mat-select [formControl]="sortForm" (selectionChange)="sortProducts()">
+                    <mat-option value="-1"></mat-option>
+                    <mat-option  value="0" i18n>NAME</mat-option>
+                    <mat-option value="1" i18n>PRICE</mat-option>
+                    <mat-option value="2" i18n>DATE</mat-option>
+                    <mat-option value="3" i18n>PERTINENCE</mat-option>
+                </mat-select>
+
+            </mat-form-field>
+            <mat-icon *ngIf="sortOrder" [ngStyle]="{'color': sortForm.value !== '-1' ?'#1d4ed8' : '#646464'}"  (click)="toggleSortOrder()">arrow_upward</mat-icon>
+            <mat-icon *ngIf="!sortOrder" [ngStyle]="{'color': sortForm.value !== '-1' ?'#1d4ed8' : '#646464'}"  (click)="toggleSortOrder()">arrow_downward</mat-icon>
+            </div>
+        </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+
+        <div class="mat-elevation-z2 rounded-2xl overflow-x-auto sm:col-span-3 flex flex-col mt-8">
+
+            <table  style="max-width: 400px" mat-table
+                    matSort [dataSource]="dataSource" *ngIf="!isLoading; else loading">
+                <ng-container matColumnDef="IMAGE">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>IMAGE</th>
+                    <td mat-cell *matCellDef="let row" [ngClass]="{'product-requested': isProductRequested(row)}">
+                        <img [src]="row.imageUrl ? row.imageUrl : 'https://primefaces.org/cdn/primeng/images/landing/air-jordan.png'"
+                        style="width: 90px; height: auto">
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="NAME">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>NAME</th>
+                    <td mat-cell *matCellDef="let row" [ngClass]="{'product-requested': isProductRequested(row)}">
+                        <span class="font-bold">{{row.name}}</span>
+                    </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="DESCRIPTION">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>DESCRIPTION</th>
+                    <td mat-cell *matCellDef="let row" [ngClass]="{'product-requested': isProductRequested(row)}">
+                        <span >{{row.description}}</span>
+                    </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="BRAND">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>BRAND</th>
+                    <td mat-cell *matCellDef="let row" [ngClass]="{'product-requested': isProductRequested(row)}">
+                        <span class="font-bold">{{row?.brand?.name}}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="PRICE">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>PRICE</th>
+                    <td mat-cell *matCellDef="let row" [ngClass]="{'product-requested': isProductRequested(row)}">
+                        <span class="font-bold">{{row?.price}} DT</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="CATEGORY">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>CATEGORY</th>
+                    <td mat-cell *matCellDef="let row" [ngClass]="{'product-requested': isProductRequested(row)}">
+                        <p-tag [style]="{ background: row?.subCategory?.category?.color}" [value]="row?.subCategory?.category?.name"/>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="SUB-CATEGORY">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>SUB-CATEGORY</th>
+                    <td mat-cell *matCellDef="let row" [ngClass]="{'product-requested': isProductRequested(row)}">
+                        <p-tag [severity]="row?.subCategory?.color" [value]="row?.subCategory?.name"/>
+                    </td>
+                </ng-container>
+
+                <ng-container *ngIf="selectedInventory" matColumnDef="QUANTITY">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>QUANTITY</th>
+                    <td mat-cell *matCellDef="let row" [ngClass]="{'product-requested': isProductRequested(row)}">
+                        <h1>{{checkHowMuchQuantityForProduct(row, selectedInventory)}}</h1>
+                    </td>
+                </ng-container>
+
+                <ng-container *ngIf="selectedInventory" matColumnDef="AVAILIBILITY">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>AVAILIBILITY</th>
+                    <td mat-cell *matCellDef="let row" [ngClass]="{'product-requested': isProductRequested(row)}">
+<!--                        TODO pipe-->
+                        <p-tag [severity]="'danger'" [value]="checkHowAvailibility(row)"/>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="ACTIONS" class="action-button">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>ACTIONS</th>
+
+                    <td mat-cell *matCellDef="let row" [ngClass]="{'product-requested': isProductRequested(row)}">
+
+                        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+
+                        <mat-menu #menu="matMenu">
+                            <button *ngIf="!selectedInventory" mat-menu-item class="action-button" (click)="editProduct(row)">
+                                <mat-icon svgIcon="feather:edit"></mat-icon>
+                                <span i18n>edit</span>
+                            </button>
+                            <button *ngIf="!selectedInventory" mat-menu-item (click)="delete(row)">
+                                <mat-icon svgIcon="delete"></mat-icon>
+                                <span i18n>delete</span>
+                            </button>
+                            <button *ngIf="selectedInventory && !depot" mat-menu-item (click)="scanCode(row)">
+                                <mat-icon svgIcon="add"></mat-icon>
+                                <span i18n>add</span>
+                            </button>
+                            <button *ngIf="selectedInventory && depot && !isProductRequested(row)" mat-menu-item (click)="addQuantity(row)">
+                                <mat-icon svgIcon="add"></mat-icon>
+                                <span>request this product</span>
+                            </button>
+                            <button *ngIf="selectedInventory && depot && isProductRequested(row)" mat-menu-item (click)="addQuantity(row)">
+                                <mat-icon svgIcon="update"></mat-icon>
+                                <span i18n>update the request</span>
+                            </button>
+                            <button *ngIf="isProductRequested(row)" mat-menu-item (click)="removeRequestedProduct(row)">
+                                <mat-icon svgIcon="delete"></mat-icon>
+                                <span i18n>delete product from requested list</span>
+                            </button>
+                            <button *ngIf="!selectedInventory" mat-menu-item class="action-button" (click)="previewProduct(row)">
+                                <mat-icon svgIcon="visibility"></mat-icon>
+                                <span i18n>preview product</span>
+                            </button>
+                        </mat-menu>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="background-color:#f6f6f6" ></tr>
+                <!-- Row shown when there is no matching data.-->
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" colspan="4" i18n>No data matching the filter</td>
+                </tr>
+
+            </table>
+            <button
+                *ngIf="depot && selectedInventory"
+                class="ml-auto mr-3 mt-7"
+                mat-flat-button
+                (click)="openRequestList()"
+                [disabled]="requestedProducts.length === 0"
+                [color]="'primary'">
+                <mat-icon [svgIcon]="'send'"></mat-icon>
+                <span class="ml-2 mr-1" i18n>SEND THE REQUEST</span>
+            </button>
+            <div>
+                <mat-paginator aria-label="Select page of groups" [pageSize]="5"></mat-paginator>
+            </div>
+
+        </div>
+
+    </mat-card-content>
+
+</mat-card>
+<ng-template #loading>
+    <div style="display: flex; align-items: center; justify-content: center; padding: 30px">
+        <div>
+            <div class="flex-col gap-4 w-full flex items-center justify-center">
+                <div class="w-28 h-28 border-8 text-blue-400 text-4xl animate-spin border-gray-300 flex items-center justify-center border-t-blue-400 rounded-full">
+                    <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em" class="animate-ping">
+                        <path d="M12.001 4.8c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C13.666 10.618 15.027 12 18.001 12c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C16.337 6.182 14.976 4.8 12.001 4.8zm-6 7.2c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624 1.177 1.194 2.538 2.576 5.512 2.576 3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C10.337 13.382 8.976 12 6.001 12z"></path>
+                    </svg>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,32 @@
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: auto;
+    flex-direction:column;
+    gap: 10px;
+}
+
+.card{
+    padding: 20px;
+    width: 700px;
+    color: white!important;
+    box-shadow: 1px 1px 2px rgba(0,0,0,.2);
+    border-radius: 20px;
+    background-color: #00a14f;
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    transition-duration: 1s;
+}
+h1{
+    color: rgb(0 70 71);
+    font-size: 16px!important;
+}
+.content{
+    width:100%;
+    display:flex;
+    align-items: center;
+    gap: 20px;
+}

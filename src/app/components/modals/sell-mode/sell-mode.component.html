@@ -1,0 +1,134 @@
+<div class="flex flex-1 w-full">
+
+<mat-card class="main-menu-tab-card">
+    <p><span style="color: #1a78c3; font-weight: bold" i18n>NAME OF AGENT :</span> {{connectedUser}}</p>
+    <mat-card-header>
+        <mat-card-title>
+            <span i18n>Requests list</span>
+        </mat-card-title>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+
+        <div class="mat-elevation-z2 rounded-2xl overflow-x-auto sm:col-span-2 flex flex-col mt-8">
+
+            <table class="min-w-240 "
+                   class="w-full bg-transparent"
+                   mat-table
+                   matSort
+                   [dataSource]="dataSource">
+
+                <ng-container matColumnDef="VERIFIED">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>VERIFIED</th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-icon *ngIf="!row.verified" style="color:#9b0000">clear</mat-icon>
+                        <mat-icon *ngIf="row.verified" style="color:#00a14f">done</mat-icon>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="REQUESTED PRODUCT">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>REQUESTED PRODUCT</th>
+                    <td [ngStyle]="{'background': row.existQuantity < row.quantity || row.existQuantity ===0 ?'#ffe5e5': null}" mat-cell *matCellDef="let row"> {{row?.product?.name}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="IMAGE">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>IMAGE</th>
+                    <td [ngStyle]="{'background': row.existQuantity < row.quantity || row.existQuantity ===0 ?'#ffe5e5': null}" mat-cell *matCellDef="let row"> <img [src]="row?.product?.imageUrl" alt="" style="height: 50px; width: auto"></td>
+                </ng-container>
+
+                <ng-container matColumnDef="QUANTITY">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>QUANTITY</th>
+                    <td [ngStyle]="{'background': row.existQuantity < row.quantity || row.existQuantity ===0 ?'#ffe5e5': null}" mat-cell *matCellDef="let row">
+                        <input *ngIf="!data?.readOnly" style="width: 50px" type="number" [value]="row.quantity" (change)="updateQuantity(row, $event)"
+                               min="0"
+                        [max]="row.existQuantity">
+                        <span *ngIf="data?.readOnly">{{row.quantity}}</span>
+                    </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="QUANTITY EXIST">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>QUANTITY EXIST</th>
+                    <td [ngStyle]="{'background': row.existQuantity < row.quantity || row.existQuantity ===0 ?'#ffe5e5': null}" mat-cell *matCellDef="let row">
+                        <span *ngIf="!data?.readOnly && row.existQuantity !== 0">{{row.existQuantity}}</span>
+                        <p-tag *ngIf="row.existQuantity === 0" severity="danger" value="OUT_OF_STOCK"></p-tag>
+                    </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="UNIT PRICE">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>UNIT PRICE</th>
+                    <td [ngStyle]="{'background': row.existQuantity < row.quantity || row.existQuantity ===0 ?'#ffe5e5': null}" mat-cell *matCellDef="let row">
+                        <span>{{row.product.price}}</span>
+                    </td>
+
+                </ng-container>
+                <ng-container matColumnDef="TOTAL PRICE">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>TOTAL PRICE</th>
+                    <td [ngStyle]="{'background': row.existQuantity < row.quantity || row.existQuantity ===0 ?'#ffe5e5': null}" mat-cell *matCellDef="let row">
+                        <span>{{row.product.price * row.quantity}}</span>
+                    </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="ACTIONS" class="action-button">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>ACTIONS</th>
+
+                    <td [ngStyle]="{'background': row.existQuantity < row.quantity || row.existQuantity ===0 ?'#ffe5e5': null}" mat-cell *matCellDef="let row">
+
+                        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+
+                        <mat-menu #menu="matMenu">
+                            <button  mat-menu-item *ngIf="!data?.readOnly" (click)="delete(row)">
+                                <mat-icon svgIcon="delete"></mat-icon>
+                                <span i18n>delete</span>
+                            </button>
+                        </mat-menu>
+
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="background-color:#f6f6f6"></tr>
+                <!-- Row shown when there is no matching data.-->
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" colspan="4" i18n>No data matching the filter</td>
+                </tr>
+            </table>
+
+            <div>
+                <mat-paginator aria-label="Select page of groups" [pageSize]="5"></mat-paginator>
+            </div>
+            <hr>
+            <div style="display: flex; justify-content: end; padding-right: 20px">
+                <mat-form-field  style="width: 150px!important;">
+                    <mat-select [formControl]="tva">
+                        <mat-option [value]="-1" i18n>CHOOSE TAX</mat-option>
+                        <mat-option *ngFor="let tva of data?.inventory?.taxes" [value]="tva">
+                            {{ tva }}%
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="tva.invalid" i18n>
+                        you need to select a <strong>TVA</strong>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+
+    </mat-card-content>
+
+</mat-card>
+    <div class="flex flex-col">
+        <div>
+    <app-code-bar-scanner [closable]="false" (detectedValue)="getDetectedValue($event)"></app-code-bar-scanner>
+        </div>
+        <div class="flex flex-col justify-center items-center">
+            <h1 style="color: #01018c; font-family: 'Inter var', sans-serif; font-size: 30px" i18n>CURRENT AMOUNT</h1>
+            <h2 style="color: #01018c; font-family: 'Inter var', sans-serif; font-size: 40px">{{ totalPrice | number : "1.2-2"}}{{ data?.inventory?.currency }}</h2>
+        </div>
+        <button mat-button style="background-color: #01018c; color: white" (click)="payment()" [disabled]="tva.invalid || selectedProducts.length <= 0 || isQuantityInvalid" i18n>PROCEED PAYMENT</button>
+    </div>
+    </div>

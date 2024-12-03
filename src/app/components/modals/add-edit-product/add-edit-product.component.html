@@ -1,0 +1,159 @@
+
+<div class="flex flex-col flex-auto md:min-w-160 max-w-240 max-h-160">
+
+    <!-- Header -->
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-primary text-on-primary">
+        <div class="text-lg font-medium">{{title}}</div>
+        <button
+            mat-icon-button
+            (click)="close()"
+            [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="productForm" class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto">
+
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>SUB-CATEGORY</mat-label>
+            <mat-select #subCategoriesList formControlName="subCategory" (selectionChange)="onSubCategoryChange($event)">
+                <div *ngFor="let subCategory of subCategories">
+                    <mat-option [value]="subCategory">
+                        {{subCategory?.name}}
+                    </mat-option>
+                </div>
+            </mat-select>
+            <mat-error *ngIf="subCategoriesList?.value == null" i18n>
+                at least one sub category <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="subCategoriesList?.value != null" >
+            <div>
+                <mat-toolbar>
+                    <input matInput [value]="selectedFileNames.length ? selectedFileNames : 'Select Image'" />
+                </mat-toolbar>
+
+                <input
+                    type="file"
+                    id="fileInput"
+                    name="fileInput"
+                    accept="image/*"
+                    (change)="selectFiles($event)"
+                />
+            </div>
+        </mat-form-field>
+
+        <div style="display:flex; align-items: center; justify-content: center">
+            <img *ngFor='let preview of previews' [src]="!removedBg ?preview : removedBg" class="preview">
+        </div>
+        <button mat-button (click)="removeBg()" *ngIf="subCategoriesList?.value != null && previews.length> 0" [disabled]="removedBg != null">
+            <mat-spinner *ngIf="isLoading" style="width: 20px!important; height: 20px!important;"></mat-spinner>
+            <span *ngIf="!isLoading" i18n>Remove Background</span></button>
+        <div *ngIf="message.length" class="message">
+            <ul *ngFor="let msg of message; let i = index">
+                <li>{{ msg }}</li>
+            </ul>
+        </div>
+
+        <!--username-->
+        <mat-form-field *ngIf="subCategoriesList?.value != null" appearance="fill" class="name">
+            <mat-label i18n>PRODUCT NAME</mat-label>
+            <input type="name" matInput formControlName="name" [appMaxLength]="FieldMaxLength.NAME">
+            <mat-error *ngIf="productForm.controls.name.invalid" i18n>
+                product name is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field *ngIf="subCategoriesList?.value != null" appearance="fill" class="name">
+            <mat-label i18n>PRICE</mat-label>
+            <input type="number" matInput formControlName="price">
+            <mat-error *ngIf="productForm.controls.price.invalid">
+                <span *ngIf="productForm.controls.price.hasError('required')" i18n>Product price is <strong>required</strong></span>
+                <span *ngIf="productForm.controls.price.hasError('min')" i18n>Product price must be <strong>positive</strong></span>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="subCategoriesList?.value != null" appearance="fill" class="name">
+            <mat-label i18n>BARCODE</mat-label>
+            <input type="text" matInput formControlName="barcode" [appMaxLength]="FieldMaxLength.BAR_CODE"><button mat-button (click)="openScanner()">scan code</button>
+            <mat-error *ngIf="productForm.controls.barcode.invalid" i18n>
+                Barcode is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="subCategoriesList?.value != null" appearance="fill" class="name">
+            <mat-label i18n>DESCRIPTION</mat-label>
+            <textarea matInput formControlName="description" [appMaxLength]="FieldMaxLength.DESCRIPTION"></textarea>
+            <mat-error *ngIf="productForm.controls.description.invalid" i18n>
+                description is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field  *ngIf="subCategoriesList?.value != null" appearance="fill" class="name">
+            <mat-label i18n>BRAND</mat-label>
+            <mat-select #brandList formControlName="brand">
+                <div *ngFor="let brand of brands">
+                    <mat-option [value]="brand?.id">
+                        {{brand?.name}}
+                    </mat-option>
+                </div>
+                <mat-option><button mat-button color="warn" class="w-full" (click)="addBrand()" i18n>Add new Brand</button></mat-option>
+            </mat-select>
+            <mat-error *ngIf="brandList?.value == null" i18n>
+                at least one brand <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="subCategoriesList?.value != null" appearance="fill" class="name">
+            <mat-label i18n>Unit of Measure</mat-label>
+            <mat-select formControlName="unitOfMeasure">
+                <mat-option *ngFor="let unit of unitOfMeasures" [value]="unit">
+                    {{ unit }}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="productForm.controls.unitOfMeasure.invalid" i18n>
+                Unit of measure is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <div formGroupName="characteristics" class="flex-container">
+            <div *ngFor="let charac of characteristicControls">
+                <mat-form-field appearance="fill">
+                    <mat-label>{{ charac.name }}</mat-label>
+                    <input matInput [formControlName]="charac.name" [appMaxLength]="FieldMaxLength.CHARACTERISTICS">
+                </mat-form-field>
+            </div>
+        </div>
+
+    </form>
+
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8
+  bg-gray-50 dark:bg-transparent">
+
+        <div class="flex items-center ml-auto mt-4 sm:mt-0">
+
+            <button class="ml-auto sm:ml-0"
+                    value="Cancel" mat-button
+                    color="warn"
+                    (click)="close()">
+                <mat-icon>cancel</mat-icon>
+                <span i18n>Cancel</span>
+            </button>
+
+            <button [value]="operation"
+                    (click)="onSubmit()"
+                    mat-button
+                    [matTooltip]="operation"
+                    color="accent"
+                    class="ml-auto"
+                    [disabled]="!productForm.valid">
+                <mat-icon svgIcon="feather:edit"></mat-icon>
+                <span>{{operation}}</span>
+            </button>
+
+        </div>
+    </div>
+
+</div>
+

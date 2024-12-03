@@ -1,0 +1,124 @@
+<div class="flex flex-col flex-auto md:min-w-160 max-w-240 max-h-160">
+
+    <!-- Header -->
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-primary text-on-primary">
+        <div class="text-lg font-medium">{{title}}</div>
+        <button
+            mat-icon-button
+            (click)="close()"
+            [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="subCategoryForm" class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto">
+        <!-- SUB-CATEGORY NAME -->
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>SUB-CATEGORY NAME</mat-label>
+            <input type="text" matInput formControlName="name" [appMaxLength]="FieldMaxLength.NAME">
+            <mat-error *ngIf="subCategoryForm.controls.name.invalid" i18n>
+                Sub-category name is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <!-- RANK CODE -->
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>RANK CODE</mat-label>
+            <input type="text" matInput formControlName="rankCode" [appMaxLength]="FieldMaxLength.RANK_CODE">
+            <mat-error *ngIf="subCategoryForm.controls.rankCode.invalid" i18n>
+                Rank code is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>COLOR</mat-label>
+            <mat-select formControlName="color">
+                <mat-option value="primary" i18n>
+                    BLUE
+                </mat-option>
+                <mat-option value="success" i18n>
+                    GREEN
+                </mat-option>
+                <mat-option value="secondary" i18n>
+                    GRAY
+                </mat-option>
+                <mat-option value="warning" i18n>
+                    ORANGE
+                </mat-option>
+                <mat-option value="danger" i18n>
+                    RED
+                </mat-option>
+                <mat-option value="contrast" i18n>
+                    BLACK
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="subCategoryForm.controls.color.invalid" i18n>
+                color is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <!-- CHARACTERISTIC NAMES -->
+        <div formArrayName="characNames" class="w-full">
+            <div class="flex flex-col" *ngFor="let characName of characNames.controls; index as i" [formGroupName]="i">
+                <mat-form-field>
+                    <mat-label i18n>CHARACTERISTIC NAME {{ i + 1 }}</mat-label>
+                    <input class="w-full" type="text" matInput formControlName="0" [appMaxLength]="FieldMaxLength.CHARACTERISTICS">
+                    <button
+                        mat-icon-button
+                        (click)="addCharacteristicField()"
+                        [tabIndex]="-1">
+                        <mat-icon
+                            class="text-current"
+                            [svgIcon]="'add'"></mat-icon>
+                    </button>
+                    <button
+                        [disabled]="this.characNames.length <= 1"
+                        mat-icon-button
+                        (click)="removeCharacteristicField(i)"
+                        [tabIndex]="-1">
+                        <mat-icon
+                            class="text-current"
+                            [svgIcon]="'remove'"></mat-icon>
+                    </button>
+                    <mat-error *ngIf="characName.invalid" i18n>
+                        Characteristic name is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+
+            </div>
+        </div>
+
+    </form>
+
+
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8
+  bg-gray-50 dark:bg-transparent">
+
+        <div class="flex items-center ml-auto mt-4 sm:mt-0">
+
+            <button class="ml-auto sm:ml-0"
+                    value="Cancel" mat-button
+                    color="warn"
+                    (click)="close()">
+                <mat-icon>cancel</mat-icon>
+                <span>Cancel</span>
+            </button>
+
+            <button [value]="operation"
+                    (click)="onSubmit()"
+                    mat-button
+                    [matTooltip]="operation"
+                    color="accent"
+                    class="ml-auto"
+                    [disabled]="!subCategoryForm.valid">
+                <mat-icon svgIcon="feather:edit"></mat-icon>
+                <span>{{operation}}</span>
+            </button>
+
+        </div>
+    </div>
+
+</div>
+

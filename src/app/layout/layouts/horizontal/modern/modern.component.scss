@@ -1,0 +1,32 @@
+.badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #00a14f;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.titan {
+    font-size: 16px;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text,text,border-box,border-box,border-box;
+    background-image: url(https://static.nulled.to/public/assets/whitebg.gif),radial-gradient(circle,#ffffff 8%,#ffffff 19%,#ffffff 35%,#ffffff 60%,#ffffff 70%,#ffffff 87%,#fff 100%),url(https://static.nulled.to/public/assets/white-lightning.gif),url(https://static.nulled.to/public/assets/blue-comet.gif);
+    background-size: 5em,15%800%,10em,25em;
+    animation: titan2key 5s linear infinite;
+    transition: .3s;
+    position: relative;
+    filter: brightness(1.5);
+}
+.lang-flag {
+    width: 20px;
+    height: 15px;
+    margin-right: 8px;
+}
+
+.flag {
+    display: flex;
+    align-items: center;
+}

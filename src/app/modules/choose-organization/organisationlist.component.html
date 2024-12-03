@@ -1,0 +1,11 @@
+<div class="container">
+    <h1 *ngIf="this.organisationKeys?.length ==0"
+        style="font-size: 25px!important; font-weight: 700!important;" i18n>
+        It seems like you don't have an organisation
+    </h1>
+    <h1 style="font-size: 25px!important; font-weight: 700!important;" class="mb-10" i18n>Choose an Organization! <span *ngIf="this.organisationKeys?.length == 0" >or create new one</span></h1>
+    <div *ngFor="let org of organisations">
+    <app-organization-card [organisation]="org" [userId]="userId" [newOrg]="this.organisationKeys?.length ==0"></app-organization-card>
+    </div>
+
+</div>

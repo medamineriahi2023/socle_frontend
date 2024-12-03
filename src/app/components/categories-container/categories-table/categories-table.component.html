@@ -1,0 +1,94 @@
+<mat-card class="main-menu-tab-card">
+    <p-toast></p-toast>
+    <mat-card-header>
+        <mat-card-title>
+            <span routerLink="security" i18n>Categories List</span>
+        </mat-card-title>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content [ngClass]="{openSubCategory : 'pl-8 pt-12 pb-48'}">
+
+        <div class="mat-elevation-z2 rounded-2xl overflow-x-auto sm:col-span-3 flex flex-col mt-8">
+
+            <table  class="w-full bg-transparent" mat-table
+                    matSort [dataSource]="dataSource" *ngIf="!isLoading; else loading">
+
+                <ng-container matColumnDef="NAME">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>NAME</th>
+                    <td mat-cell *matCellDef="let row" [ngStyle]="{'background-color': (row.id == selectedCategory?.id && subCategoryPage) ? '#6366f1' : null,
+                     'color':(row.id == selectedCategory?.id && subCategoryPage)? 'white' : null}" >
+                        <span class="font-bold">{{row.name}}</span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="Number OF SUB-CATEGORIES">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>Number of Sub-Categories</th>
+                    <td mat-cell *matCellDef="let row" [ngStyle]="{'background-color': (row.id == selectedCategory?.id && subCategoryPage) ? '#6366f1' : null,
+                     'color':(row.id == selectedCategory?.id && subCategoryPage)? 'white' : null}" >
+                        <span class="font-bold">{{row.subCategories?.length}}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="ACTIONS" class="action-button">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>ACTIONS</th>
+
+                    <td mat-cell *matCellDef="let row" [ngStyle]="{'background-color': (row.id == selectedCategory?.id && subCategoryPage) ? '#6366f1' : null,
+                     'color':(row.id == selectedCategory?.id && subCategoryPage)? 'white' : null}" >
+
+                        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+
+                        <mat-menu #menu="matMenu">
+                          <button  mat-menu-item class="action-button" (click)="editCategory(row)">
+                               <mat-icon svgIcon="feather:edit"></mat-icon>
+                                <span i18n>edit</span>
+                            </button>
+                            <button  mat-menu-item (click)="delete(row)">
+                                <mat-icon svgIcon="delete"></mat-icon>
+                                <span i18n>delete</span>
+                            </button>
+                            <button mat-menu-item (click)="editSubCategories(row)">
+                             <mat-icon svgIcon="groups"></mat-icon>
+                             <span i18n>edit subCategories</span>
+                             </button>
+
+
+
+                        </mat-menu>
+
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="background-color:#f6f6f6" (click)="onRowClicked(row)">
+                </tr>
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" colspan="4" i18n>No data matching the filter</td>
+                </tr>
+            </table>
+
+            <div>
+                <mat-paginator aria-label="Select page of groups" [pageSize]="5"></mat-paginator>
+            </div>
+
+        </div>
+
+    </mat-card-content>
+
+</mat-card>
+<ng-template #loading>
+    <div style="display: flex; align-items: center; justify-content: center; padding: 30px">
+        <div>
+            <div class="flex-col gap-4 w-full flex items-center justify-center">
+                <div class="w-28 h-28 border-8 text-blue-400 text-4xl animate-spin border-gray-300 flex items-center justify-center border-t-blue-400 rounded-full">
+                    <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em" class="animate-ping">
+                        <path d="M12.001 4.8c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C13.666 10.618 15.027 12 18.001 12c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C16.337 6.182 14.976 4.8 12.001 4.8zm-6 7.2c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624 1.177 1.194 2.538 2.576 5.512 2.576 3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C10.337 13.382 8.976 12 6.001 12z"></path>
+                    </svg>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</ng-template>

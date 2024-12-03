@@ -1,0 +1,214 @@
+
+<div class="flex flex-col flex-auto md:min-w-160 max-w-240 max-h-160">
+
+    <!-- Header -->
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-primary text-on-primary">
+        <div class="text-lg font-medium">{{title}}</div>
+        <button
+            mat-icon-button
+            (click)="close()"
+            [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="inventoryForm" class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto">
+
+        <div class="avatar-container">
+            <div class="image-container" *ngIf="file; else placeholder"
+                 [ngClass]="{'box-shadow-avatar': !!file}"
+                 [ngStyle]="{backgroundImage: 'url(' + file + ')'}">
+            </div>
+
+            <ng-template #placeholder>
+                <div class="image-container avatar-placeholder">
+                </div>
+            </ng-template>
+
+            <label for="avatar-input-file">
+                <div class="icon-wrapper">
+                    <input type="file" id="avatar-input-file" accept="image/*" (change)="onFileChange($event)" />
+                    <mat-icon class="icon" fontIcon="edit"></mat-icon>
+                </div>
+            </label>
+
+        </div>
+
+        <!--username-->
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>INVENTORY NAME</mat-label>
+            <input type="name" matInput formControlName="name" [appMaxLength]="FieldMaxLength.NAME">
+            <mat-error *ngIf="inventoryForm.controls.name.invalid" i18n>
+                inventory name is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>REGISTRATION NUMBER</mat-label>
+            <input type="name" matInput formControlName="registrationNumber" [appMaxLength]="FieldMaxLength.NAME">
+            <mat-error *ngIf="inventoryForm.controls.registrationNumber.invalid" i18n>
+                registration number is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>COMMERCIAL E-MAIL</mat-label>
+            <input type="name" matInput formControlName="commercialEmailAddress" [appMaxLength]="FieldMaxLength.EMAIL">
+            <mat-error *ngIf="inventoryForm.controls.commercialEmailAddress.invalid" i18n>
+                commercial email address is <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="inventoryForm.controls.commercialEmailAddress.invalid && inventoryForm.controls.commercialEmailAddress.errors.email" i18n>
+                Please enter a valid email address
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>TYPE OF INVENTORY</mat-label>
+            <mat-select formControlName="type">
+                <mat-option *ngFor="let type of typeOfInventory" [value]="type">
+                    {{ type }}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="inventoryForm.controls.type.invalid" i18n>
+                type of inventory is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>ADDRESS</mat-label>
+            <button mat-button (click)="selectPlace()" style="padding: 10px; background-color: #1190f3; color: white">
+                <p *ngIf="inventoryForm.controls.address.value == null" i18n>CHOOSE A PLACE</p>
+                <p *ngIf="inventoryForm.controls.address.value != null" i18n>UPDATE PLACE</p>
+            </button>
+            <textarea type="name" matInput style="margin-left: 20px" formControlName="address" readonly [appMaxLength]="FieldMaxLength.ADDRESS"></textarea>
+            <mat-error *ngIf="inventoryForm.controls.address.invalid" i18n>
+                Address is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <div style="height: fit-content" *ngIf="showMap">
+            <map-component
+                [longitude]="inventoryForm.controls.longitude.value"
+                [latitude]="inventoryForm.controls.latitude.value"
+                (selectedLocaltion)="selectedLocation($event)"
+                (deletedMarker)="onDeletedMarkers($event)"
+                (hasNoMarkers)="checkMarkers($event)"
+                [organization]="data?.org != null ? data?.org : null"
+            ></map-component>
+        </div>
+
+        <mat-form-field  appearance="fill" class="name">
+            <mat-label i18n>RESPONSIBLE</mat-label>
+            <mat-select #usersList formControlName="responsible">
+                <div *ngFor="let user of users">
+                    <mat-option [value]="user?.id">
+                        {{user.userName}}
+                    </mat-option>
+                </div>
+            </mat-select>
+            <mat-error *ngIf="inventoryForm.controls.responsible.invalid" i18n>
+                responsible is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>CURRENCY</mat-label>
+            <mat-select formControlName="currency">
+                <mat-option *ngFor="let currency of CurrencyList" [value]="currency.code">
+                    {{ currency.text }}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="inventoryForm.controls.currency.invalid" i18n>
+                currency of inventory is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+
+
+
+        <div *ngIf="operation === 'Save'">
+            <mat-label  class="text-md font-medium" i18n>Phone</mat-label>
+            <intl-telephone-input
+                [preferredCountries]="[CountryISO.Tunisia, CountryISO.France]"
+                [enablePlaceholder]="true"
+                [searchCountryFlag]="true"
+                [separateDialCode]="false"
+                [enableAutoCountrySelect]="true"
+                [searchCountryField]="SearchCountryField.All"
+                [phoneValidation]="false"
+                [numberFormat]="PhoneNumberFormat.International"
+                (onChange)="onInputChange($event)"
+            >
+            </intl-telephone-input>
+            <mat-error *ngIf="phoneNumber != undefined && phoneNumber.phoneNumber.length == 0" i18n>
+                phone is <strong>required</strong>
+            </mat-error>
+
+            <mat-error *ngIf="phoneNumber != undefined && !phoneNumber?.isNumberValid" i18n>
+                phone is <strong>not valid</strong>
+            </mat-error>
+            <br>
+        </div>
+        <div formArrayName="taxes" class="w-full">
+            <div class="flex flex-col" *ngFor="let tax of taxes.controls; index as i" [formGroupName]="i">
+                <mat-form-field>
+                    <mat-label i18n>TVA % {{ i + 1 }}</mat-label>
+                    <input class="w-full" type="text" matInput formControlName="0" [appMaxLength]="FieldMaxLength.TVA">
+                    <button
+                        mat-icon-button
+                        (click)="addTaxField()"
+                        [tabIndex]="-1">
+                        <mat-icon
+                            class="text-current"
+                            [svgIcon]="'add'"></mat-icon>
+                    </button>
+                    <button
+                        [disabled]="this.taxes.length <= 1"
+                        mat-icon-button
+                        (click)="removeTaxField(i)"
+                        [tabIndex]="-1">
+                        <mat-icon
+                            class="text-current"
+                            [svgIcon]="'remove'"></mat-icon>
+                    </button>
+                    <mat-error *ngIf="tax.invalid" i18n>
+                        Tax is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+
+            </div>
+        </div>
+
+    </form>
+
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8
+  bg-gray-50 dark:bg-transparent">
+
+        <div class="flex items-center ml-auto mt-4 sm:mt-0">
+
+            <button class="ml-auto sm:ml-0"
+                    value="Cancel" mat-button
+                    color="warn"
+                    (click)="close()">
+                <mat-icon>cancel</mat-icon>
+                <span i18n>Cancel</span>
+            </button>
+
+            <button [value]="operation"
+                    (click)="onSubmit()"
+                    mat-button
+                    [matTooltip]="operation"
+                    color="accent"
+                    class="ml-auto"
+                    [disabled]="!inventoryForm.valid">
+                <mat-icon svgIcon="feather:edit"></mat-icon>
+                <span>{{operation}}</span>
+            </button>
+
+        </div>
+    </div>
+
+</div>
+

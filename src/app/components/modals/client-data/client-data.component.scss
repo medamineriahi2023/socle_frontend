@@ -1,0 +1,20 @@
+/* Hide the radio buttons */
+input[type="radio"] {
+    display: none;
+}
+
+/* Style the labels */
+input[type="radio"] + label {
+    width: 200px;
+    height: auto;
+    cursor: pointer;
+    margin: 5px;
+    border: 2px solid transparent; /* Default border */
+    border-radius: 5px; /* Optional: Rounded corners */
+    transition: border-color 0.3s ease; /* Smooth transition for border color */
+}
+
+/* Add a blue border when the radio button is selected */
+input[type="radio"]:checked + label {
+    border-color: blue;
+}

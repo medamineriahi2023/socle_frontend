@@ -1,0 +1,57 @@
+<div class="flex flex-col flex-auto md:min-w-160 max-w-240 max-h-160">
+
+    <!-- Header -->
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-primary text-on-primary">
+        <div class="text-lg font-medium">{{title}}</div>
+        <button
+            mat-icon-button
+            (click)="close()"
+            [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="roleForm" class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto">
+
+
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>ROLE NAME</mat-label>
+            <input type="name" matInput formControlName="name" [appMaxLength]="FieldMaxLength.NAME">
+            <mat-error *ngIf="roleForm.controls.name.invalid" i18n>
+                role name is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+    </form>
+
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8
+  bg-gray-50 dark:bg-transparent">
+
+        <div class="flex items-center ml-auto mt-4 sm:mt-0">
+
+            <button class="ml-auto sm:ml-0"
+                    value="Cancel" mat-button
+                    color="warn"
+                    (click)="close()">
+                <mat-icon>cancel</mat-icon>
+                <span i18n>Cancel</span>
+            </button>
+
+            <button [value]="operation"
+                    (click)="onSubmit()"
+                    mat-button
+                    [matTooltip]="operation"
+                    color="accent"
+                    class="ml-auto"
+                    [disabled]="!roleForm.valid">
+                <mat-icon svgIcon="feather:edit"></mat-icon>
+                <span>{{operation}}</span>
+            </button>
+
+        </div>
+    </div>
+
+</div>
+

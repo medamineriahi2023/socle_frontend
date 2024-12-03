@@ -1,0 +1,45 @@
+<div class="flex flex-col w-full" style="padding: 20px!important; border: 0!important;" >
+<p-accordion [activeIndex]="selectedCategory != null ? 1 : 0" (activeIndexChange)="activeIndexChange($event)">
+    <p-accordionTab [tabStyle]="{'background':'red'}" header="Categories" i18n-header>
+        <app-categories-container (getCategory)="onSelectedCategory($event)"
+                                  [selectedCategory]="selectedCategory" [subCategoryPage]="true">
+
+        </app-categories-container>
+    </p-accordionTab>
+    <p-accordionTab header="Sub-Categories" i18n-header [disabled]="!selectedCategory">
+        <div class="flex flex-col w-full" *ngIf="selectedCategory != null" >
+
+            <div class="w-11/12 mx-auto mt-5">
+
+                <div class="flex flex-row w-full">
+                    <filter (filterChange)="filterValue = $event" [filterValue]="filterValue"></filter>
+                    <button
+                        *ngIf="!subCategoryPage"
+                        [disabled]="!isUserAdmin"
+                        class="ml-auto mr-3 mt-7"
+                        mat-flat-button
+                        [color]="'primary'"
+                        (click)="addSubCategory()">
+                        <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                        <span class="ml-2 mr-1" i18n>Add</span>
+                    </button>
+                </div>
+                <app-sub-category-table [filterValue]="filterValue" [selectedCategory]="selectedCategory"></app-sub-category-table>
+
+            </div>
+
+        </div>
+    </p-accordionTab>
+</p-accordion>
+</div>
+
+
+
+
+
+
+
+
+
+
+

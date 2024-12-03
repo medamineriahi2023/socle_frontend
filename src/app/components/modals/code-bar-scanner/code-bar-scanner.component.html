@@ -1,0 +1,17 @@
+<h1 i18n>
+    Barcode Scanner - detected barcode:
+    <small style="color: blue;">{{value}}</small>
+</h1>
+<p style="color: red;" *ngIf="isError" i18n>Barcode scan is not available.</p>
+<ngx-barcode-scanner
+    [(value)]="value"
+    [codes]="['code_128', 'ean', 'upc', 'upc_e', 'ean_8']"
+    [errorThreshold]="0.1"
+    (valueChange)="onValueChange($event)"
+    (exception)="onError($event)"
+></ngx-barcode-scanner>
+<br>
+<mat-form-field appearance="fill" class="w-full">
+    <mat-label i18n>ENTER CODE MANUALLY</mat-label>
+    <input type="text" matInput (input)="barCodeChanged($event)" (change)="barCodeChanged($event)" (keydown)="handleKeyPress($event)">
+</mat-form-field>

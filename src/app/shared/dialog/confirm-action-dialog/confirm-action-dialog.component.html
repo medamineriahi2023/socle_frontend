@@ -1,0 +1,14 @@
+<div mat-dialog-title fxLayout="row" fxLayoutAlign="space-between center" class="primary mb-0 justify-between">
+    <span *ngIf="(!!data && !!data.title); else defaultTitle" class="font-size-16">{{data.title}}</span>
+    <ng-template #defaultTitle>
+        <span class="font-size-16">{{ 'Confirm ?'}}</span>
+    </ng-template>
+</div>
+<mat-dialog-content class="font-size-14">
+    <span>{{data.message}}</span>
+</mat-dialog-content>
+<mat-divider></mat-divider>
+<mat-dialog-actions align="end" class="font-size-14 justify-evenly">
+    <button mat-raised-button color="accent" mat-dialog-close cdkFocusInitial>Cancel</button>
+    <button mat-button [mat-dialog-close]="true" (click)="onConfirm()">Yes</button>
+</mat-dialog-actions>

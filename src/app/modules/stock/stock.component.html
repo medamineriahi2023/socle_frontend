@@ -1,0 +1,83 @@
+<div class="overflow-hidden flex flex-row w-full">
+    <!-- menu -->
+    <div class="flex flex-col w-90">
+        <div class="flex-col h-full border-r">
+            <!-- Title -->
+            <div class="flex justify-center bg-gray-50">
+                <div class="text-3xl font-extrabold tracking-tight leading-none py-6 " i18n>
+                    Stock
+                </div>
+            </div>
+            <!-- Panel links -->
+            <div class=" divide-y h-full bg-white">
+                <ng-container *ngFor="let panel of panels">
+                    <div
+                        class="flex px-8 py-5 cursor-pointer "
+                        [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedPanel || selectedPanel !== panel.id,
+                                    'bg-primary-50 dark:bg-hover': selectedPanel && selectedPanel === panel.id}"
+                        (click)="detectComp(panel.id)">
+                        <mat-icon
+                            [ngClass]="{'text-hint': !selectedPanel || selectedPanel !== panel.id,
+                                        'text-primary dark:text-primary-500': selectedPanel && selectedPanel === panel.id}"
+                            [svgIcon]="panel.icon"></mat-icon>
+                        <div class="ml-3">
+                            <div
+                                class="font-medium leading-6"
+                                [ngClass]="{'text-primary dark:text-primary-500': selectedPanel && selectedPanel === panel.id}">
+                                {{panel.title}}
+                            </div>
+                            <div class=" text-secondary">
+                                {{panel.description}}
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+    <!-- main -->
+    <div class="flex flex-col flex-grow ">
+        <main-container>
+            <ng-container main_header>
+                <div class="hidden sm:flex flex-wrap items-center font-medium h-10">
+                    <div class="flex items-center whitespace-nowrap">
+                        <mat-icon svgIcon="mat_solid:devices_other" class="mr-2"></mat-icon>
+                        <span class="whitespace-nowrap">
+          Stock
+          </span>
+                    </div>
+                    <div class="flex items-center ml-1 whitespace-nowrap">
+                        <mat-icon
+                            class="icon-size-5 text-secondary"
+                            [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+
+                        <span class="ml-1 text-primary-500 text-lg font-bold leading-none"> {{selectedPanel}} </span>
+
+                    </div>
+                </div>
+
+                <div class="flex mr-auto"></div>
+
+            </ng-container>
+            <ng-container *ngIf="selectedPanel === 'Categories'" main_body>
+                <app-categories-container (changeSelectedPanel)="changeSelectedPanel($event)" [userId]="'tesr'" [isUserAdmin]="isUserAdmin"></app-categories-container>
+            </ng-container>
+            <ng-container *ngIf="selectedPanel === 'subCategories'" main_body>
+                <app-sub-category-container [selectedCategory]="selectedCategory" [isUserAdmin]="isUserAdmin" ></app-sub-category-container>
+            </ng-container>
+            <ng-container *ngIf="selectedPanel === 'Products'" main_body>
+                <app-product-container [isUserAdmin]="isUserAdmin"></app-product-container>
+            </ng-container>
+            <ng-container *ngIf="selectedPanel === 'Inventories'" main_body>
+                <app-inventory-container [userId]="userId"  [isUserAdmin]="isUserAdmin"></app-inventory-container>
+            </ng-container>
+            <ng-container *ngIf="selectedPanel === 'Payment History'" main_body>
+                <app-payment-history [userId]="userId"  [isUserAdmin]="isUserAdmin"></app-payment-history>
+            </ng-container>
+            <ng-container *ngIf="selectedPanel === 'Track Delivery'" main_body>
+                <app-tracking-map></app-tracking-map>
+            </ng-container>
+        </main-container>
+
+    </div>
+</div>

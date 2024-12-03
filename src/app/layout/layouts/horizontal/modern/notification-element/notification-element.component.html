@@ -1,0 +1,74 @@
+
+<div class="flex-col w-full items-center justify-content-center my-1.5">
+    <div class="flex gap-3 justify-center items-center" *ngIf="!isResponse; else notResponse">
+        <div style="width: 100px!important; height: 100px">
+            <img [src]="command.theRequesterInventory?.imageUrl" style="border-radius: 100%" />
+        </div>
+        <div class="flex justify-between items-center gap-3">
+            <div style="width: 91%!important;">
+            <span style="font-size: 14px" i18n>The inventory {{command.theRequesterInventory.name}} requested {{command.productsRequested.length}} products</span>
+        </div>
+            <div class="flex-col justify-center">
+                <div>
+            <p-tag [icon]="icon" [severity]="severity" [value]="command.status"/>
+                </div>
+                <div>
+                <span  style="font-size: 12px; color: #646363">{{command.updateDate | date: 'dd MMMM yy hh:mm'}}</span>
+                </div>
+                </div>
+        </div>
+
+
+    </div>
+    <div *ngIf="command.status == Status.IN_PROCESSING" style="width: 100%; display: flex; justify-content: center; gap: 10px; margin-top: 5px">
+        <button  mat-button style="background: #4ebb83; color: white; padding: 5px 10px!important;" (click)="openRequests()" i18n>See command</button>
+        <button mat-button i18n>Ignore</button>
+    </div>
+    <ng-template #notResponse>
+        <div *ngIf="command.status === Status.REJECTED">
+        <div class="flex flex-1 gap-3 justify-center items-center">
+            <div>
+                <img [src]="command.inventory?.imageUrl"
+                     style="width : auto ; height: 70px ; border-radius: 100%" alt="">
+            </div>
+            <div style="width: 91%!important;">
+            <span style="font-size: 14px; " i18n>The owner of the depot {{command.inventory.name}} has <strong style="color: #690000">rejected</strong> your command</span>
+            </div>
+            </div>
+            <div style="width: 100%; display: flex; justify-content: end; gap: 10px; margin-top: 5px">
+                <button  mat-button style="background: #8a8a8a; color: white;"  (click)="seeOnly()" i18n>See details</button>
+            </div>
+        </div>
+
+        <div *ngIf="command.status === Status.IN_DELIVERY">
+            <div class="flex gap-3 justify-center items-center">
+                <div>
+                    <img [src]="command.inventory?.imageUrl"
+                         style="width : 70px!important ; height: 70px ; border-radius: 100%" alt="">
+                </div>
+                <div style="width: 91%!important;">
+                <span style="font-size: 14px" i18n>The owner of the depot {{command.inventory.name}} has <strong style="color: #00602b">Approved</strong> your command</span>
+                </div>
+            </div>
+            <div style="width: 100%; display: flex; justify-content: center; gap: 10px; margin-top: 5px">
+                <button  mat-button style="background: #4ebb83; color: white; padding: 5px 10px!important;" (click)="confirm()" i18n>Confirm the receive</button>
+                <button mat-button i18n>Ignore</button>
+            </div>
+        </div>
+
+        <div *ngIf="command.status === Status.APPROVED">
+            <div class="flex gap-3 justify-center items-center">
+                <div>
+                    <img [src]="command.theRequesterInventory?.imageUrl"
+                         style="width : 70px!important ; height: 70px ; border-radius: 100%" alt="">
+                </div>
+                <div style="width: 91%!important;">
+                <span style="font-size: 14px" i18n>You have <strong style="color: #00602b">Confirmed </strong> the recipe of the command</span>
+                </div>
+                </div>
+            <div style="width: 100%; display: flex; justify-content: end; gap: 10px; margin-top: 5px">
+                <button mat-button style="background: #8a8a8a; color: white;" (click)="seeOnly()" i18n>See details</button>
+            </div>
+        </div>
+    </ng-template>
+</div>

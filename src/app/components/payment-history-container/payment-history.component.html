@@ -1,0 +1,18 @@
+<div class="flex flex-col w-full">
+
+    <div class="w-11/12 mx-auto mt-5">
+        <div class="flex flex-row w-full">
+            <filter (filterChange)="filterValue = $event"></filter>
+        </div>
+        <p-tabView [(activeIndex)]="selectedTab" (activeIndexChange)="getSelected($event)">
+            <p-tabPanel header="PAYMENT HISTORY" i18n-header>
+                <app-payment-history-table  [filterValue]="filterValue"></app-payment-history-table>
+            </p-tabPanel>
+            <p-tabPanel header="OPERATION HISTORY" *ngIf="isUserAdmin" i18n-header>
+                <app-command-history [filterValue]="filterValue"></app-command-history>
+
+            </p-tabPanel>
+        </p-tabView>
+    </div>
+
+</div>

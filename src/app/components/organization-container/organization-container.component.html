@@ -1,0 +1,24 @@
+<div class="flex flex-col w-full">
+
+    <div class="w-11/12 mx-auto mt-5">
+        <div class="flex justify-between flex-row w-full">
+            <div>
+            <filter (filterChange)="filterValue = $event"></filter>
+            </div>
+            <div>
+            <button
+                [disabled]="!isUserAdmin"
+                class="ml-auto mr-3 mt-7"
+                mat-flat-button
+                [color]="'primary'"
+                (click)="addOrganization()">
+                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                <span class="ml-2 mr-1" i18n>Add</span>
+            </button>
+            </div>
+        </div>
+        <organization-table [userId]="userId"  [isUserAdmin]="isUserAdmin" [refresh]="refresh" [filterValue]="filterValue" [filterPredicate]="filterPredicate"></organization-table>
+
+    </div>
+
+</div>

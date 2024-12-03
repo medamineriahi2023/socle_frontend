@@ -1,0 +1,53 @@
+
+<div class="flex flex-col w-full">
+
+    <div class="w-11/12 mx-auto mt-5">
+        <div class="flex flex-row w-full">
+            <filter (filterChange)="filterValue = $event"></filter>
+            <button
+                [disabled]="!isUserAdmin"
+                class="ml-auto mr-3 mt-7"
+                mat-flat-button
+                [color]="'primary'"
+                (click)="addUser()">
+                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                <span class="ml-2 mr-1" i18n>Add</span>
+            </button>
+        </div>
+
+        <p-tabView (activeIndexChange)="getIndex($event)" >
+            <p-tabPanel>
+                <ng-template pTemplate="header" style="background-color: red!important;">
+                    <div class="flex align-items-center gap-2">
+                        <p-avatar
+                            image="https://www.mckinsey.com/~/media/mckinsey/business%20functions/people%20and%20organizational%20performance/how%20we%20help%20clients/capabilities_people-organization-performance_thumb_1536x1536.jpg"
+                            shape="circle" />
+                        <span class="font-bold white-space-nowrap m-0" i18n>
+                        USERS OF {{localStorage.getItem("organizationName").toUpperCase()}}
+                    </span>
+                    </div>
+                </ng-template>
+                <app-user-table [userId]="userId" [isUserAdmin]="isUserAdmin" [refresh]="refresh"  [filterValue]="filterValue"
+                                [filterPredicate]="filterPredicate">
+                </app-user-table>
+            </p-tabPanel>
+            <p-tabPanel *ngIf="isUserAdmin">
+                <ng-template pTemplate="header">
+                    <div class="flex align-items-center gap-2">
+                        <p-avatar
+                            image="https://img.freepik.com/premium-photo/blue-planet-earth-globe-universe-vector-art-illustration-avatar-icon-wallpaper-pic-emoji-emoticon_985204-11389.jpg"
+                            shape="circle" />
+                        <span class="font-bold white-space-nowrap m-0" i18n>
+                        GLOBAL USERS LIST
+                    </span>
+                    </div>
+                </ng-template>
+                <app-user-global-table [isUserAdmin]="isUserAdmin" [refresh]="refresh"  [filterValue]="filterValue"
+                                [filterPredicate]="filterPredicate">
+                </app-user-global-table>
+            </p-tabPanel>
+        </p-tabView>
+
+
+    </div>
+</div>

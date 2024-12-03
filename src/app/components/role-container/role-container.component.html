@@ -1,0 +1,33 @@
+<div class="flex flex-col w-full">
+
+    <div class="w-11/12 mx-auto mt-5">
+        <div class="flex flex-row w-full">
+            <filter (filterChange)="filterValue = $event"></filter>
+            <button
+                [disabled]="!isUserAdmin"
+                class="ml-auto mr-3 mt-7"
+                mat-flat-button
+                [color]="'primary'"
+                (click)="addRole()"
+            >
+                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                <span class="ml-2 mr-1" i18n>Add</span>
+            </button>
+        </div>
+
+
+        <p-tabView [(activeIndex)]="selectedTab" (activeIndexChange)="getSelected($event)">
+            <p-tabPanel header="{{localStorage.getItem('organizationName').toUpperCase()}} ROLES">
+                <app-role-table [isUserAdmin]="isUserAdmin" [refresh]="refresh" [filterValue]="filterValue"
+                                [filterPredicate]="filterPredicate">
+                </app-role-table>
+
+            </p-tabPanel>
+            <p-tabPanel header="GLOBAL APPLICATION ROLES" *ngIf="isUserAdmin" i18n-header>
+                <app-global-role-table  [refresh]="refresh"  [filterValue]="filterValue"
+                                        [filterPredicate]="filterPredicate">
+                </app-global-role-table>
+            </p-tabPanel>
+        </p-tabView>
+    </div>
+</div>

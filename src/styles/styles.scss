@@ -1,0 +1,11 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Import/write your custom styles here.
+/*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
+/* ----------------------------------------------------------------------------------------------------- */
+@import "primeicons/primeicons.css";
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+/* workflow.component.css */
+@import '~bpmn-js/dist/assets/diagram-js.css';
+@import '~bpmn-js/dist/assets/bpmn-js.css';
+@import '~bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';

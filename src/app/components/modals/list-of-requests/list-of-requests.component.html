@@ -1,0 +1,236 @@
+<div class="flex flex-col flex-auto md:min-w-160 max-w-240 max-h-160"  *ngIf="!requestAccepted">
+
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-primary text-on-primary">
+        <div class="text-lg font-medium" i18n>Manage requests list</div>
+        <button
+            mat-icon-button
+            (click)="close()"
+            [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+<mat-card class="main-menu-tab-card">
+
+    <mat-card-header>
+        <mat-card-title>
+            <span>Requests list</span>
+        </mat-card-title>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+
+        <div class="mat-elevation-z2 rounded-2xl overflow-x-auto sm:col-span-2 flex flex-col mt-8">
+
+            <table class="min-w-240 "
+                   class="w-full bg-transparent"
+                   mat-table
+                   matSort
+                   [dataSource]="dataSource">
+
+                <ng-container matColumnDef="VERIFIED">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>VERIFIED</th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-icon *ngIf="!row.verified" style="color:#9b0000">clear</mat-icon>
+                        <mat-icon *ngIf="row.verified" style="color:#00a14f">done</mat-icon>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="REQUESTED PRODUCT">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>REQUESTED PRODUCT</th>
+                    <td mat-cell *matCellDef="let row"> {{row?.product?.name}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="IMAGE">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>IMAGE</th>
+                    <td mat-cell *matCellDef="let row"> <img [src]="row?.product?.imageUrl" alt="" style="height: 50px; width: auto"></td>
+                </ng-container>
+
+                <ng-container matColumnDef="QUANTITY">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>QUANTITY</th>
+                    <td mat-cell *matCellDef="let row">
+                        <input *ngIf="!data?.readOnly" type="number" [value]="row.quantity" (change)="updateQuantity(row, $event)"
+                                                              [max]="checkHowMuchQuantityForProduct(row.product, data.inventory)" [min]="1">
+                        <span *ngIf="data?.readOnly">{{row.quantity}}</span>
+                    </td>
+
+                </ng-container>
+
+
+                <ng-container matColumnDef="ACTIONS" class="action-button">
+                    <th mat-header-cell *matHeaderCellDef style="background-color: #01aef8; color:white" i18n>ACTIONS</th>
+
+                    <td mat-cell *matCellDef="let row">
+
+                        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+
+                        <mat-menu #menu="matMenu">
+                            <button  mat-menu-item *ngIf="!data?.readOnly" (click)="delete(row)">
+                                <mat-icon svgIcon="delete"></mat-icon>
+                                <span i18n>delete</span>
+                            </button>
+                            <button  mat-menu-item *ngIf="data?.readOnly" [disabled]="row.quantity <= 0" (click)="scanProduct(row)">
+                                <mat-icon svgIcon="qr_code_scanner"></mat-icon>
+                                <span i18n>scan product one by one</span>
+                            </button>
+                            <button  mat-menu-item *ngIf="data?.readOnly" [disabled]="row.quantity <= 0" (click)="scanProduct(row, true)">
+                                <mat-icon svgIcon="qr_code_scanner"></mat-icon>
+                                <span i18n>scan all products once</span>
+                            </button>
+                        </mat-menu>
+
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="background-color:#f6f6f6"></tr>
+                <!-- Row shown when there is no matching data.-->
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" colspan="4" i18n>No data matching the filter</td>
+                </tr>
+            </table>
+
+            <div>
+                <mat-paginator aria-label="Select page of groups" [pageSize]="10"></mat-paginator>
+            </div>
+            <hr *ngIf="data?.readOnly && !data?.confirm && !data?.disabled">
+            <div *ngIf="data?.readOnly && !data?.confirm && !data?.disabled" style="display: flex; justify-content: end; padding-right: 20px">
+            <mat-form-field  style="width: 150px!important;">
+                <mat-select [formControl]="tva">
+                    <mat-option [value]="-1" i18n>CHOOSE TAX</mat-option>
+                    <mat-option *ngFor="let tva of data.command?.inventory?.taxes" [value]="tva">
+                        {{ tva }}%
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="tva.invalid" i18n>
+                    you need to select a <strong>TVA</strong>
+                </mat-error>
+            </mat-form-field>
+            </div>
+        </div>
+
+    </mat-card-content>
+
+</mat-card>
+<button
+    *ngIf="!data?.readOnly"
+    class="ml-auto mr-3 mt-7 self-end"
+    mat-flat-button
+    (click)="sendRequest()"
+    [disabled]="dataSource.data.length === 0"
+    [color]="'primary'">
+    <mat-icon [svgIcon]="'send'"></mat-icon>
+    <span class="ml-2 mr-1" i18n>CONFIRM THE REQUEST</span>
+</button>
+    <button
+        *ngIf="data?.readOnly && data?.disabled && data?.command?.status === Status.APPROVED"
+        class="ml-auto mr-3 mt-7 self-end"
+        style="background-color: #c3601a; color: white"
+        mat-flat-button
+        (click)="generateInvoice()"
+        [disabled]="dataSource.data.length === 0">
+        <mat-icon [svgIcon]="'receipt_long'"></mat-icon>
+        <span class="ml-2 mr-1" i18n>Generate invoice</span>
+    </button>
+<div *ngIf="!data.disabled" style="display: flex; align-items: center; justify-content: end; gap: 10px">
+    <button
+        style="background: #605f5f; color: white;"
+        *ngIf="data?.readOnly && !data?.confirm"
+        class="mt-7"
+        mat-flat-button
+        (click)="close()"
+        [disabled]="dataSource.data.length === 0"
+        [color]="'accent'">
+        <mat-icon>clear</mat-icon>
+        <span class="ml-2 mr-1" i18n>IGNORE</span>
+    </button>
+    <button
+        *ngIf="data?.readOnly  && !data?.confirm"
+        class="mt-7"
+        mat-flat-button
+        (click)="refuseRequest()"
+        [disabled]="dataSource.data.length === 0"
+        [color]="'warn'">
+        <mat-icon>clear</mat-icon>
+        <span class="ml-2 mr-1" i18n>REFUSE</span>
+    </button>
+    <button
+        style="background: #4ebb83; color: white;"
+        *ngIf="data?.readOnly  && !data?.confirm"
+        class=" mt-7 "
+        mat-flat-button
+        (click)="acceptRequest()"
+        [disabled]="!isAllVerified || tva.invalid"
+        [color]="'warn'">
+        <mat-icon>done_outline</mat-icon>
+        <span class="ml-2 mr-1" i18n>ACCEPT THE REQUEST</span>
+    </button>
+
+    <button
+        style="background: #4ebb83; color: white;"
+        *ngIf="data?.confirm"
+        class=" mt-7 "
+        mat-flat-button
+        (click)="receiveTheCommand()"
+        [disabled]="!isAllVerified"
+        [color]="'warn'">
+        <mat-icon>done_outline</mat-icon>
+        <span class="ml-2 mr-1" i18n>RECEIVE THE COMMAND</span>
+    </button>
+</div>
+</div>
+
+<div class="container" *ngIf="requestAccepted">
+    <div class="car-wrapper">
+        <div class="car-wrapper_inner">
+
+            <div class="car_outter">
+                <div class="car">
+                    <div class="body">
+                        <div></div>
+                    </div>
+                    <div class="decos">
+                        <div class="line-bot"></div>
+                        <div class="door">
+                            <div class="handle"></div>
+                            <div class="bottom"></div>
+                        </div>
+                        <div class="window"></div>
+                        <div class="light"></div>
+                        <div class="light-front"></div>
+                        <div class="antenna"></div>
+                        <div class="ice-cream">
+                            <div class="cone"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="wheel"></div>
+                        <div class="wheel"></div>
+                    </div>
+                    <div class="wind">
+                        <div class="p p1"></div>
+                        <div class="p p2"></div>
+                        <div class="p p3"></div>
+                        <div class="p p4"></div>
+                        <div class="p p5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="background-stuff">
+        <div class="bg"></div>
+        <div class="bg bg-2"></div>
+        <div class="bg bg-3"></div>
+        <div class="ground"></div>
+    </div>
+
+</div>
+
+

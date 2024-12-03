@@ -1,0 +1,8 @@
+<button (click)="chooseOrganisation(organisation)"><div class="card">
+    <div class="content">
+        <p-avatar [label]="organisation.name[0]" styleClass="mr-2" size="large" [style]="{ 'background-color': '#2196F3', color: '#ffffff' }"
+                  shape="circle"></p-avatar>
+        <h1>{{ organisation.name }}</h1>
+    </div>
+    <span class="pi-chevron-right"></span>
+</div></button>

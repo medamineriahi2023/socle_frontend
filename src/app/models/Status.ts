@@ -1,0 +1,6 @@
+export enum Status {
+    IN_PROCESSING = "IN_PROCESSING",
+    IN_DELIVERY = "IN_DELIVERY",
+    APPROVED = "APPROVED",
+    REJECTED = "REJECTED",
+}

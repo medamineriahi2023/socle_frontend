@@ -1,0 +1,115 @@
+<div class="flex flex-col flex-auto md:min-w-160 max-w-240 max-h-160">
+
+    <!-- Header -->
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-primary text-on-primary">
+        <div class="text-lg font-medium">{{title}}</div>
+        <button
+            mat-icon-button
+            (click)="close()"
+            [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="clientForm" class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto">
+
+
+        <mat-label i18n>Select Payment method :</mat-label>
+        <div class="flex align-items-center justify-evenly">
+        <input type="radio"
+            [id]="Method.BANK_CARD"
+            [value]="Method.BANK_CARD"
+            formControlName="method" />
+        <label [for]="Method.BANK_CARD" class="ml-2 text-center font-bold text-blue-800">
+            <img src="../../../../assets/images/test/debitcard.png" alt="">
+            <span i18n>BANK CARD</span>
+        </label>
+            <input type="radio"
+            [id]="Method.CASH"
+
+            [value]="Method.CASH"
+            formControlName="method" />
+        <label style="width: 135px!important;" [for]="Method.CASH" class="ml-2 text-center font-bold text-blue-800">
+            <img src="../../../../assets/images/test/cash.png" alt="">
+            <span i18n>CASH</span>
+        </label>
+        </div>
+
+        <mat-form-field *ngIf="clientForm.controls.method.value === 'CASH'" appearance="fill" class="name">
+            <mat-label i18n>THE CLIENT AMOUNT</mat-label>
+            <input type="name" matInput formControlName="clientAmount">
+            <mat-error *ngIf="clientForm.controls.clientAmount.invalid" i18n>
+                full name is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <p style="font-size: 20px; color: #600202" i18n>
+            Price HTT :  {{ this.data.priceHTT | number: '1.2-2' }} {{this.data.inventory.currency}}
+        </p>
+        <p style="font-size: 30px; color: #b60413" i18n>
+            Total amount is :  {{ this.data.totalPrice | number: '1.2-2' }} {{this.data.inventory.currency}}
+        </p>
+
+        <p *ngIf="clientForm.controls.method.value === 'CASH'" style="font-size: 30px; color: #4a51e1" i18n>
+            YOU SHOULD RETURN {{ returnCost | number: '1.2-2' }} {{this.data.inventory.currency}}
+        </p>
+
+        <button mat-button (click)="userPayed()" *ngIf="returnCost >= 0 && !payed">PAYED</button>
+        <div class="flex flex-col flex-auto" *ngIf="(payed && clientForm.controls.method.value === 'CASH') || clientForm.controls.method.value === 'BANK_CARD'">
+        <!--username-->
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>FULL NAME</mat-label>
+            <input type="name" matInput formControlName="fullName" [appMaxLength]="FieldMaxLength.FULL_NAME">
+            <mat-error *ngIf="clientForm.controls.fullName.invalid" i18n>
+                full name is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>ADDRESS</mat-label>
+            <input type="name" matInput formControlName="address" [appMaxLength]="FieldMaxLength.ADDRESS">
+            <mat-error *ngIf="clientForm.controls.address.invalid" i18n>
+                address is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="name">
+            <mat-label i18n>PHONE NUMBER</mat-label>
+            <input type="name" matInput formControlName="phone" [appMaxLength]="FieldMaxLength.PHONE">
+            <mat-error *ngIf="clientForm.controls.phone.invalid" i18n>
+                phone is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+</div>
+
+    </form>
+
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8
+  bg-gray-50 dark:bg-transparent">
+
+        <div class="flex items-center ml-auto mt-4 sm:mt-0">
+
+            <button class="ml-auto sm:ml-0"
+                    value="Cancel" mat-button
+                    color="warn"
+                    (click)="close()">
+                <mat-icon>cancel</mat-icon>
+                <span i18n>Cancel</span>
+            </button>
+
+            <button [value]="operation"
+                    (click)="onSubmit()"
+                    mat-button
+                    [matTooltip]="operation"
+                    color="accent"
+                    class="ml-auto"
+                    [disabled]="!clientForm.valid">
+                <mat-icon svgIcon="feather:edit"></mat-icon>
+                <span>{{operation}}</span>
+            </button>
+
+        </div>
+    </div>
+
+</div>
+
